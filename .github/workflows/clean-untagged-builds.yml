@@ -9,4 +9,4 @@ jobs:
         uses: dylanratcliffe/delete-untagged-containers@main
         with:
           package_name: headscale-webui
-          token: ${{ secrets.ACTIONS_WORKFLOWS }}
+          token: ${{ secrets.GITHUB_TOKEN }}
