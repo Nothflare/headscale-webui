@@ -455,7 +455,6 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
         ns_id             = machine["user"]["id"],
         ns_created        = machine["user"]["createdAt"],
         last_seen         = str(last_seen_print),
-        last_update       = str(last_update_print),
         machine_ips       = Markup(machine_ips),
         advertised_routes = Markup(routes),
         exit_node_badge   = Markup(exit_node_badge),
