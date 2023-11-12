@@ -42,7 +42,7 @@ def render_overview():
     
     # Get all machines:
     machines = headscale.get_machines(url, api_key)
-    machines_count = len(machines["machines"])
+    machines_count = len(machines["nodes"])
 
     # Need to check if routes are attached to an active machine:
     # ISSUE:  https://github.com/iFargle/headscale-webui/issues/36 
@@ -53,19 +53,19 @@ def render_overview():
 
     total_routes = 0
     for route in routes["routes"]:
-        if int(route['machine']['id']) != 0: 
+        if int(route['node']['id']) != 0: 
             total_routes += 1
 
     enabled_routes = 0
     for route in routes["routes"]:
-        if route["enabled"] and route['advertised'] and int(route['machine']['id']) != 0: 
+        if route["enabled"] and route['advertised'] and int(route['node']['id']) != 0: 
             enabled_routes += 1
 
     # Get a count of all enabled exit routes
     exits_count = 0
     exits_enabled_count = 0
     for route in routes["routes"]:
-        if route['advertised'] and int(route['machine']['id']) != 0:
+        if route['advertised'] and int(route['node']['id']) != 0:
             if route["prefix"] == "0.0.0.0/0" or route["prefix"] == "::/0":
                 exits_count +=1
                 if route["enabled"]:
@@ -349,7 +349,7 @@ def thread_machine_content(machine, machine_content, idx, all_routes, failover_p
             for route in pulled_routes["routes"]:
                 # Get the remaining routes - No exits or failover pairs
                 if route["prefix"] != "0.0.0.0/0" and route["prefix"] != "::/0" and route["prefix"] not in failover_pair_prefixes:
-                    app.logger.debug("Route:  ["+str(route['machine']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
+                    app.logger.debug("Route:  ["+str(route['node']['name'])+"] id: "+str(route['id'])+" / prefix: "+str(route['prefix'])+" enabled?:  "+str(route['enabled']))
                     route_enabled = "red"
                     route_tooltip = 'enable'
                     if route["enabled"]:
@@ -487,7 +487,7 @@ def render_machines_cards():
 
     #########################################
     # Thread this entire thing.  
-    num_threads = len(machines_list["machines"])
+    num_threads = len(machines_list["nodes"])
     iterable = []
     machine_content = {}
     failover_pair_prefixes = []
@@ -503,10 +503,10 @@ def render_machines_cards():
 
     if LOG_LEVEL == "DEBUG":
         # DEBUG:  Do in a forloop:
-        for idx in iterable: thread_machine_content(machines_list["machines"][idx], machine_content, idx, all_routes, failover_pair_prefixes)
+        for idx in iterable: thread_machine_content(machines_list["nodes"][idx], machine_content, idx, all_routes, failover_pair_prefixes)
     else:
         app.logger.info("Starting futures")
-        futures = [executor.submit(thread_machine_content, machines_list["machines"][idx], machine_content, idx, all_routes, failover_pair_prefixes) for idx in iterable]
+        futures = [executor.submit(thread_machine_content, machines_list["nodes"][idx], machine_content, idx, all_routes, failover_pair_prefixes) for idx in iterable]
         # Wait for the executor to finish all jobs:
         wait(futures, return_when=ALL_COMPLETED)
         app.logger.info("Finished futures")
