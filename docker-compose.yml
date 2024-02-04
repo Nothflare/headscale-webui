@@ -1,7 +1,7 @@
 version: "3"
 services:
   headscale-webui:
-    image: ghcr.io/nothflare/headscale-webui:latest
+    image: ghcr.io/nothflare/headscale-webui:build
     container_name: headscale-webui
     environment:
       - TZ=Asia/Tokyo
